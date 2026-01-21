@@ -67,8 +67,24 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
         log.info("POST /api/v1/products - Creating new product: {}", product.getSku());
-        Product createdProduct = productService.createProduct(product);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+        log.debug("Product creation request - SKU: {}, Name: '{}', Price: {}, Quantity: {}",
+                product.getSku(), product.getName(), product.getPrice(), product.getQuantity());
+
+        long startTime = System.currentTimeMillis();
+
+        try {
+            Product createdProduct = productService.createProduct(product);
+            long duration = System.currentTimeMillis() - startTime;
+
+            log.info("Product created successfully - ID: {}, SKU: {} in {}ms",
+                    createdProduct.getId(), createdProduct.getSku(), duration);
+            log.debug("Created product details: {}", createdProduct);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+        } catch (IllegalArgumentException e) {
+            log.warn("Product creation failed - Duplicate SKU: {}", product.getSku());
+            throw e;
+        }
     }
 
     /**
@@ -112,7 +128,19 @@ public class ProductController {
             @RequestParam String query,
             @PageableDefault(size = 20) Pageable pageable) {
         log.info("GET /api/v1/products/search - Searching products with query: {}", query);
-        return ResponseEntity.ok(productService.searchProducts(query, pageable));
+        log.debug("Search parameters - Query: '{}', Page: {}, Size: {}, Sort: {}",
+                query, pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+
+        long startTime = System.currentTimeMillis();
+        Page<Product> results = productService.searchProducts(query, pageable);
+        long duration = System.currentTimeMillis() - startTime;
+
+        log.info("Search completed - Found {} results for query '{}' in {}ms",
+                results.getTotalElements(), query, duration);
+        log.debug("Returning page {} of {} with {} products",
+                results.getNumber() + 1, results.getTotalPages(), results.getNumberOfElements());
+
+        return ResponseEntity.ok(results);
     }
 
     /**

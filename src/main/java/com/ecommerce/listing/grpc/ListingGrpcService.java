@@ -53,11 +53,21 @@ public class ListingGrpcService {
      */
     public Product getProduct(Long productId) {
         log.info("gRPC getProduct called for ID: {}", productId);
+        long startTime = System.currentTimeMillis();
 
         try {
-            return productService.getProductByIdOrThrow(productId);
+            Product product = productService.getProductByIdOrThrow(productId);
+            long duration = System.currentTimeMillis() - startTime;
+
+            log.debug("gRPC getProduct - Retrieved product {} (SKU: {}) in {}ms",
+                    productId, product.getSku(), duration);
+            log.debug("Product details - Name: '{}', Price: {}, Stock: {}",
+                    product.getName(), product.getPrice(), product.getQuantity());
+
+            return product;
         } catch (EntityNotFoundException e) {
-            log.error("Product not found: {}", productId);
+            long duration = System.currentTimeMillis() - startTime;
+            log.error("gRPC getProduct failed - Product not found: {} ({}ms)", productId, duration);
             throw e;
         }
     }
@@ -213,7 +223,21 @@ public class ListingGrpcService {
      */
     public List<Product> getProductsByIds(List<Long> productIds) {
         log.info("gRPC getProductsByIds called for {} products", productIds.size());
-        return productService.getProductsByIds(productIds);
+        log.debug("Requested product IDs: {}", productIds);
+
+        long startTime = System.currentTimeMillis();
+        List<Product> products = productService.getProductsByIds(productIds);
+        long duration = System.currentTimeMillis() - startTime;
+
+        log.info("gRPC batch retrieval completed - Requested: {}, Found: {}, Duration: {}ms",
+                productIds.size(), products.size(), duration);
+
+        if (products.size() < productIds.size()) {
+            log.warn("Some products not found - Requested: {}, Found: {}",
+                    productIds.size(), products.size());
+        }
+
+        return products;
     }
 
     /**

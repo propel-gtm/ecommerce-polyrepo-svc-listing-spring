@@ -32,7 +32,15 @@ public class ProductService {
      */
     public Page<Product> getAllProducts(Pageable pageable) {
         log.debug("Fetching all products with pagination: {}", pageable);
-        return productRepository.findAll(pageable);
+        long startTime = System.currentTimeMillis();
+
+        Page<Product> result = productRepository.findAll(pageable);
+
+        long duration = System.currentTimeMillis() - startTime;
+        log.debug("Retrieved {} products out of {} total in {}ms",
+                result.getNumberOfElements(), result.getTotalElements(), duration);
+
+        return result;
     }
 
     /**
@@ -79,8 +87,18 @@ public class ProductService {
     @Transactional
     public Product updateProduct(Long id, Product productDetails) {
         log.info("Updating product with ID: {}", id);
+        log.debug("Update details - Name: '{}', Price: {}, Quantity: {}, Status: {}",
+                productDetails.getName(), productDetails.getPrice(),
+                productDetails.getQuantity(), productDetails.getStatus());
 
         Product existingProduct = getProductByIdOrThrow(id);
+        log.debug("Existing product found - SKU: {}, Current Price: {}, Current Quantity: {}",
+                existingProduct.getSku(), existingProduct.getPrice(), existingProduct.getQuantity());
+
+        // Track changes for audit
+        boolean priceChanged = !existingProduct.getPrice().equals(productDetails.getPrice());
+        boolean quantityChanged = existingProduct.getQuantity() != productDetails.getQuantity();
+        boolean statusChanged = existingProduct.getStatus() != productDetails.getStatus();
 
         // Update fields
         existingProduct.setName(productDetails.getName());
@@ -94,7 +112,23 @@ public class ProductService {
         existingProduct.setWeight(productDetails.getWeight());
         existingProduct.setTags(productDetails.getTags());
 
-        return productRepository.save(existingProduct);
+        Product saved = productRepository.save(existingProduct);
+
+        if (priceChanged) {
+            log.debug("Price updated for product {}: {} -> {}",
+                    id, existingProduct.getPrice(), productDetails.getPrice());
+        }
+        if (quantityChanged) {
+            log.debug("Quantity updated for product {}: {} -> {}",
+                    id, existingProduct.getQuantity(), productDetails.getQuantity());
+        }
+        if (statusChanged) {
+            log.debug("Status updated for product {}: {} -> {}",
+                    id, existingProduct.getStatus(), productDetails.getStatus());
+        }
+
+        log.debug("Product {} successfully updated", id);
+        return saved;
     }
 
     /**
@@ -123,8 +157,21 @@ public class ProductService {
      * Search products by query.
      */
     public Page<Product> searchProducts(String query, Pageable pageable) {
-        log.debug("Searching products with query: {}", query);
-        return productRepository.searchProducts(query, pageable);
+        log.debug("Searching products with query: '{}', page: {}, size: {}",
+                query, pageable.getPageNumber(), pageable.getPageSize());
+        long startTime = System.currentTimeMillis();
+
+        Page<Product> result = productRepository.searchProducts(query, pageable);
+
+        long duration = System.currentTimeMillis() - startTime;
+        log.debug("Search completed: found {} products matching '{}' in {}ms",
+                result.getTotalElements(), query, duration);
+
+        if (result.isEmpty()) {
+            log.debug("No products found for search query: '{}'", query);
+        }
+
+        return result;
     }
 
     /**
