@@ -16,7 +16,7 @@ spring:
 
   # JPA Configuration
   jpa:
-    open-in-view: false
+    open-in-view: true  # Enable to allow lazy loading in web views (required for @ElementCollection)
     hibernate:
       ddl-auto: ${JPA_DDL_AUTO:update}
     show-sql: ${JPA_SHOW_SQL:false}
@@ -142,4 +142,11 @@ spring:
       on-profile: docker
 
   datasource:
-    url: jdbc:postgresql://postgres:5432/listing
+    url: ${DATABASE_URL:jdbc:postgresql://postgres:5432/listings}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect

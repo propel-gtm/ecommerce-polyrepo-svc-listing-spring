@@ -63,7 +63,7 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "image_url")
     @Builder.Default
@@ -80,7 +80,7 @@ public class Product {
     @Column(precision = 5, scale = 2)
     private BigDecimal weight;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "product_tags", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "tag")
     @Builder.Default
