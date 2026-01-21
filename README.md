@@ -2,6 +2,62 @@
 
 A microservice for managing product listings in an e-commerce platform. Provides both REST and gRPC interfaces.
 
+## 🎯 About This Repository
+
+This repository is part of the **ecommerce-polyrepo** project - a polyrepo setup designed for testing the [Propel](https://propel.us) code review feature across multiple microservices.
+
+### Role in Microservices Architecture
+
+The Listing Service handles **product catalog and search functionality**:
+
+```
+┌──────────────┐
+│ API Gateway  │
+│   (Go/Gin)   │
+└──────┬───────┘
+       │ gRPC
+       ▼
+┌──────────────────┐
+│ Listing Service  │
+│  (Spring Boot)   │
+│   [THIS REPO]    │
+│                  │
+│ • Product CRUD   │
+│ • Categories     │
+│ • Search/Filter  │
+│ • REST + gRPC    │
+└──────────────────┘
+```
+
+### Quick Start (Standalone Testing)
+
+To test this service independently:
+
+```bash
+# 1. Ensure Java 17+ and Maven 3.8+ are installed
+java -version
+mvn -version
+
+# 2. Build the project
+mvn clean package
+
+# 3. Run the application
+mvn spring-boot:run
+
+# 4. Test REST endpoints
+curl http://localhost:8080/api/v1/products
+
+# 5. Test specific product
+curl http://localhost:8080/api/v1/products/1
+
+# 6. Search products
+curl http://localhost:8080/api/v1/products/search?query=laptop
+```
+
+**Note:** This service can run independently with an embedded H2 database for testing. For production, it integrates with PostgreSQL and other services via gRPC. The gRPC server runs on port 9090. See the [parent polyrepo](https://github.com/jasonyuezhang/ecommerce-polyrepo) for full stack setup.
+
+---
+
 ## Features
 
 - Product CRUD operations
