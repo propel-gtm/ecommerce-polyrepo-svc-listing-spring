@@ -67,8 +67,8 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
         log.info("POST /api/v1/products - Creating new product: {}", product.getSku());
-        log.debug("Product creation request - SKU: {}, Name: '{}', Price: {}, Quantity: {}",
-                product.getSku(), product.getName(), product.getPrice(), product.getQuantity());
+        log.debug("Product creation request - SKU: {}, Name: '{}', Price: {}",
+                product.getSku(), product.getName(), product.getPrice());
 
         long startTime = System.currentTimeMillis();
 
@@ -197,19 +197,6 @@ public class ProductController {
         log.info("PATCH /api/v1/products/{}/status - Updating status", id);
         ProductStatus status = ProductStatus.valueOf(statusUpdate.get("status"));
         productService.updateProductStatus(id, status);
-        return ResponseEntity.ok().build();
-    }
-
-    /**
-     * Update product quantity.
-     */
-    @PatchMapping("/{id}/quantity")
-    public ResponseEntity<Void> updateProductQuantity(
-            @PathVariable Long id,
-            @RequestBody Map<String, Integer> quantityUpdate) {
-        log.info("PATCH /api/v1/products/{}/quantity - Updating quantity", id);
-        int amount = quantityUpdate.get("amount");
-        productService.updateProductQuantity(id, amount);
         return ResponseEntity.ok().build();
     }
 

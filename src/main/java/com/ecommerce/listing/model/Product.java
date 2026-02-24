@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,11 +21,15 @@ import java.util.List;
  * Product entity representing items in the catalog.
  */
 @Entity
-@Table(name = "products", indexes = {
-    @Index(name = "idx_product_sku", columnList = "sku", unique = true),
-    @Index(name = "idx_product_category", columnList = "category_id"),
-    @Index(name = "idx_product_status", columnList = "status")
-})
+@Table(name = "products",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_product_seller_sku", columnNames = {"seller_id", "sku"})
+    },
+    indexes = {
+        @Index(name = "idx_product_seller_id", columnList = "seller_id"),
+        @Index(name = "idx_product_category", columnList = "category_id"),
+        @Index(name = "idx_product_status", columnList = "status")
+    })
 @Data
 @Builder
 @NoArgsConstructor
@@ -39,8 +42,11 @@ public class Product {
     private Long id;
 
     @NotBlank(message = "SKU is required")
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(nullable = false, length = 50)
     private String sku;
+
+    @Column(name = "seller_id", nullable = false, length = 36)
+    private String sellerId;
 
     @NotBlank(message = "Product name is required")
     @Column(nullable = false, length = 255)
@@ -53,11 +59,6 @@ public class Product {
     @Positive(message = "Price must be positive")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
-
-    @PositiveOrZero(message = "Quantity cannot be negative")
-    @Column(nullable = false)
-    @Builder.Default
-    private Integer quantity = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -107,31 +108,9 @@ public class Product {
 
     /**
      * Check if the product is available for purchase.
+     * Quantity check is delegated to inventory service.
      */
     public boolean isAvailable() {
-        return status == ProductStatus.ACTIVE && quantity > 0;
-    }
-
-    /**
-     * Decrease quantity by the specified amount.
-     */
-    public void decreaseQuantity(int amount) {
-        if (amount > this.quantity) {
-            throw new IllegalArgumentException("Insufficient quantity");
-        }
-        this.quantity -= amount;
-        if (this.quantity == 0) {
-            this.status = ProductStatus.OUT_OF_STOCK;
-        }
-    }
-
-    /**
-     * Increase quantity by the specified amount.
-     */
-    public void increaseQuantity(int amount) {
-        this.quantity += amount;
-        if (this.status == ProductStatus.OUT_OF_STOCK && this.quantity > 0) {
-            this.status = ProductStatus.ACTIVE;
-        }
+        return status == ProductStatus.ACTIVE;
     }
 }
