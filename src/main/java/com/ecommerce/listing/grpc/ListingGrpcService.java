@@ -32,7 +32,6 @@ import java.util.List;
  *   rpc DeleteProduct (DeleteProductRequest) returns (DeleteProductResponse);
  *   rpc SearchProducts (SearchProductsRequest) returns (ListProductsResponse);
  *   rpc GetProductsByCategory (GetProductsByCategoryRequest) returns (ListProductsResponse);
- *   rpc UpdateProductQuantity (UpdateQuantityRequest) returns (ProductResponse);
  * }
  *
  * @GrpcService annotation is commented out because this is a skeleton implementation
@@ -61,8 +60,8 @@ public class ListingGrpcService {
 
             log.debug("gRPC getProduct - Retrieved product {} (SKU: {}) in {}ms",
                     productId, product.getSku(), duration);
-            log.debug("Product details - Name: '{}', Price: {}, Stock: {}",
-                    product.getName(), product.getPrice(), product.getQuantity());
+            log.debug("Product details - Name: '{}', Price: {}",
+                    product.getName(), product.getPrice());
 
             return product;
         } catch (EntityNotFoundException e) {
@@ -104,7 +103,7 @@ public class ListingGrpcService {
      * public void createProduct(CreateProductRequest request, StreamObserver<ProductResponse> responseObserver)
      */
     public Product createProduct(String sku, String name, String description,
-                                  BigDecimal price, int quantity, Long categoryId,
+                                  BigDecimal price, Long categoryId,
                                   List<String> imageUrls, String brand, List<String> tags) {
         log.info("gRPC createProduct called for SKU: {}", sku);
 
@@ -113,7 +112,6 @@ public class ListingGrpcService {
                 .name(name)
                 .description(description)
                 .price(price)
-                .quantity(quantity)
                 .imageUrls(imageUrls)
                 .brand(brand)
                 .tags(tags)
@@ -130,7 +128,7 @@ public class ListingGrpcService {
      * public void updateProduct(UpdateProductRequest request, StreamObserver<ProductResponse> responseObserver)
      */
     public Product updateProduct(Long productId, String name, String description,
-                                  BigDecimal price, int quantity, String status,
+                                  BigDecimal price, String status,
                                   List<String> imageUrls, String brand, List<String> tags) {
         log.info("gRPC updateProduct called for ID: {}", productId);
 
@@ -139,7 +137,6 @@ public class ListingGrpcService {
         existingProduct.setName(name);
         existingProduct.setDescription(description);
         existingProduct.setPrice(price);
-        existingProduct.setQuantity(quantity);
         existingProduct.setStatus(ProductStatus.valueOf(status));
         existingProduct.setImageUrls(imageUrls);
         existingProduct.setBrand(brand);
@@ -183,19 +180,6 @@ public class ListingGrpcService {
 
         PageRequest pageRequest = PageRequest.of(page, size);
         return productService.getProductsByCategory(categoryId, pageRequest);
-    }
-
-    /**
-     * Update product quantity.
-     *
-     * In a real implementation with generated stubs:
-     * public void updateProductQuantity(UpdateQuantityRequest request, StreamObserver<ProductResponse> responseObserver)
-     */
-    public Product updateProductQuantity(Long productId, int amount) {
-        log.info("gRPC updateProductQuantity called for ID: {} with amount: {}", productId, amount);
-
-        productService.updateProductQuantity(productId, amount);
-        return productService.getProductByIdOrThrow(productId);
     }
 
     /**

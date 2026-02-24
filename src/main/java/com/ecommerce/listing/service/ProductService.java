@@ -74,8 +74,9 @@ public class ProductService {
     public Product createProduct(Product product) {
         log.info("Creating new product with SKU: {}", product.getSku());
 
+        // SKU is now unique per seller, not globally unique
         if (productRepository.existsBySku(product.getSku())) {
-            throw new IllegalArgumentException("Product with SKU already exists: " + product.getSku());
+            throw new IllegalArgumentException("Product with SKU already exists for this seller: " + product.getSku());
         }
 
         return productRepository.save(product);
@@ -87,24 +88,22 @@ public class ProductService {
     @Transactional
     public Product updateProduct(Long id, Product productDetails) {
         log.info("Updating product with ID: {}", id);
-        log.debug("Update details - Name: '{}', Price: {}, Quantity: {}, Status: {}",
+        log.debug("Update details - Name: '{}', Price: {}, Status: {}",
                 productDetails.getName(), productDetails.getPrice(),
-                productDetails.getQuantity(), productDetails.getStatus());
+                productDetails.getStatus());
 
         Product existingProduct = getProductByIdOrThrow(id);
-        log.debug("Existing product found - SKU: {}, Current Price: {}, Current Quantity: {}",
-                existingProduct.getSku(), existingProduct.getPrice(), existingProduct.getQuantity());
+        log.debug("Existing product found - SKU: {}, Current Price: {}",
+                existingProduct.getSku(), existingProduct.getPrice());
 
         // Track changes for audit
         boolean priceChanged = !existingProduct.getPrice().equals(productDetails.getPrice());
-        boolean quantityChanged = existingProduct.getQuantity() != productDetails.getQuantity();
         boolean statusChanged = existingProduct.getStatus() != productDetails.getStatus();
 
         // Update fields
         existingProduct.setName(productDetails.getName());
         existingProduct.setDescription(productDetails.getDescription());
         existingProduct.setPrice(productDetails.getPrice());
-        existingProduct.setQuantity(productDetails.getQuantity());
         existingProduct.setCategory(productDetails.getCategory());
         existingProduct.setImageUrls(productDetails.getImageUrls());
         existingProduct.setStatus(productDetails.getStatus());
@@ -117,10 +116,6 @@ public class ProductService {
         if (priceChanged) {
             log.debug("Price updated for product {}: {} -> {}",
                     id, existingProduct.getPrice(), productDetails.getPrice());
-        }
-        if (quantityChanged) {
-            log.debug("Quantity updated for product {}: {} -> {}",
-                    id, existingProduct.getQuantity(), productDetails.getQuantity());
         }
         if (statusChanged) {
             log.debug("Status updated for product {}: {} -> {}",
@@ -217,21 +212,6 @@ public class ProductService {
         if (updated == 0) {
             throw new EntityNotFoundException("Product not found with ID: " + productId);
         }
-    }
-
-    /**
-     * Update product quantity.
-     */
-    @Transactional
-    public void updateProductQuantity(Long productId, int amount) {
-        log.info("Updating quantity for product ID {} by {}", productId, amount);
-
-        Product product = getProductByIdOrThrow(productId);
-        if (amount < 0 && product.getQuantity() + amount < 0) {
-            throw new IllegalArgumentException("Insufficient quantity for product: " + productId);
-        }
-
-        productRepository.updateQuantity(productId, amount);
     }
 
     /**
