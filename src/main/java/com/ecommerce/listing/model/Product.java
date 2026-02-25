@@ -3,6 +3,7 @@ package com.ecommerce.listing.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
@@ -49,9 +50,11 @@ public class Product {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    // Price stored in cents (smallest currency unit) per proto Money.units convention
+    // e.g., $19.99 = 1999, $1.00 = 100
     @NotNull(message = "Price is required")
-    @Positive(message = "Price must be positive")
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Min(value = 100, message = "Price must be at least 100 (cents). $1.00 = 100")
+    @Column(nullable = false, precision = 12, scale = 0)
     private BigDecimal price;
 
     @PositiveOrZero(message = "Quantity cannot be negative")
