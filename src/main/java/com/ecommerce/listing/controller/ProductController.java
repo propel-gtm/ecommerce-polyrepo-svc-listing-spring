@@ -67,8 +67,8 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
         log.info("POST /api/v1/products - Creating new product: {}", product.getSku());
-        log.debug("Product creation request - SKU: {}, Name: '{}', Price: {}, Quantity: {}",
-                product.getSku(), product.getName(), product.getPrice(), product.getQuantity());
+        log.debug("Product creation request - SKU: {}, Title: '{}', Price: {}, Quantity: {}",
+                product.getSku(), product.getTitle(), product.getPrice(), product.getQuantity());
 
         long startTime = System.currentTimeMillis();
 

@@ -47,10 +47,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findAllAvailable(Pageable pageable);
 
     /**
-     * Search products by name or description.
+     * Search products by title or description.
      */
     @Query("SELECT p FROM Product p WHERE " +
-           "LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+           "LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
            "LOWER(p.description) LIKE LOWER(CONCAT('%', :query, '%'))")
     Page<Product> searchProducts(@Param("query") String query, Pageable pageable);
 
