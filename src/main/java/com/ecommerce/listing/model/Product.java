@@ -42,9 +42,10 @@ public class Product {
     @Column(nullable = false, unique = true, length = 50)
     private String sku;
 
-    @NotBlank(message = "Product name is required")
-    @Column(nullable = false, length = 255)
-    private String name;
+    // Renamed from 'name' to 'title' to align with proto schema Listing.title
+    @NotBlank(message = "Product title is required")
+    @Column(nullable = false, length = 255, name = "title")
+    private String title;
 
     @Column(columnDefinition = "TEXT")
     private String description;

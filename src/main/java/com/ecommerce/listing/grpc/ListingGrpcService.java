@@ -61,8 +61,8 @@ public class ListingGrpcService {
 
             log.debug("gRPC getProduct - Retrieved product {} (SKU: {}) in {}ms",
                     productId, product.getSku(), duration);
-            log.debug("Product details - Name: '{}', Price: {}, Stock: {}",
-                    product.getName(), product.getPrice(), product.getQuantity());
+            log.debug("Product details - Title: '{}', Price: {}, Stock: {}",
+                    product.getTitle(), product.getPrice(), product.getQuantity());
 
             return product;
         } catch (EntityNotFoundException e) {
@@ -103,14 +103,14 @@ public class ListingGrpcService {
      * In a real implementation with generated stubs:
      * public void createProduct(CreateProductRequest request, StreamObserver<ProductResponse> responseObserver)
      */
-    public Product createProduct(String sku, String name, String description,
+    public Product createProduct(String sku, String title, String description,
                                   BigDecimal price, int quantity, Long categoryId,
                                   List<String> imageUrls, String brand, List<String> tags) {
         log.info("gRPC createProduct called for SKU: {}", sku);
 
         Product product = Product.builder()
                 .sku(sku)
-                .name(name)
+                .title(title)
                 .description(description)
                 .price(price)
                 .quantity(quantity)
@@ -129,14 +129,14 @@ public class ListingGrpcService {
      * In a real implementation with generated stubs:
      * public void updateProduct(UpdateProductRequest request, StreamObserver<ProductResponse> responseObserver)
      */
-    public Product updateProduct(Long productId, String name, String description,
+    public Product updateProduct(Long productId, String title, String description,
                                   BigDecimal price, int quantity, String status,
                                   List<String> imageUrls, String brand, List<String> tags) {
         log.info("gRPC updateProduct called for ID: {}", productId);
 
         Product existingProduct = productService.getProductByIdOrThrow(productId);
 
-        existingProduct.setName(name);
+        existingProduct.setTitle(title);
         existingProduct.setDescription(description);
         existingProduct.setPrice(price);
         existingProduct.setQuantity(quantity);

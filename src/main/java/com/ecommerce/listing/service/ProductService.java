@@ -87,8 +87,8 @@ public class ProductService {
     @Transactional
     public Product updateProduct(Long id, Product productDetails) {
         log.info("Updating product with ID: {}", id);
-        log.debug("Update details - Name: '{}', Price: {}, Quantity: {}, Status: {}",
-                productDetails.getName(), productDetails.getPrice(),
+        log.debug("Update details - Title: '{}', Price: {}, Quantity: {}, Status: {}",
+                productDetails.getTitle(), productDetails.getPrice(),
                 productDetails.getQuantity(), productDetails.getStatus());
 
         Product existingProduct = getProductByIdOrThrow(id);
@@ -101,7 +101,7 @@ public class ProductService {
         boolean statusChanged = existingProduct.getStatus() != productDetails.getStatus();
 
         // Update fields
-        existingProduct.setName(productDetails.getName());
+        existingProduct.setTitle(productDetails.getTitle());
         existingProduct.setDescription(productDetails.getDescription());
         existingProduct.setPrice(productDetails.getPrice());
         existingProduct.setQuantity(productDetails.getQuantity());
