@@ -1,5 +1,6 @@
 package com.ecommerce.listing.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -40,6 +41,7 @@ public class Product {
 
     @NotBlank(message = "SKU is required")
     @Column(nullable = false, unique = true, length = 50)
+    @JsonProperty("seller_sku")
     private String sku;
 
     @NotBlank(message = "Product name is required")
