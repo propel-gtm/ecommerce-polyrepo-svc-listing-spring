@@ -101,8 +101,11 @@ public class Product {
         DRAFT,
         ACTIVE,
         INACTIVE,
-        OUT_OF_STOCK,
-        DISCONTINUED
+        PENDING_REVIEW,
+        REJECTED,
+        SOLD_OUT,
+        DISCONTINUED,
+        SUSPENDED
     }
 
     /**
@@ -121,7 +124,7 @@ public class Product {
         }
         this.quantity -= amount;
         if (this.quantity == 0) {
-            this.status = ProductStatus.OUT_OF_STOCK;
+            this.status = ProductStatus.SOLD_OUT;
         }
     }
 
@@ -130,7 +133,7 @@ public class Product {
      */
     public void increaseQuantity(int amount) {
         this.quantity += amount;
-        if (this.status == ProductStatus.OUT_OF_STOCK && this.quantity > 0) {
+        if (this.status == ProductStatus.SOLD_OUT && this.quantity > 0) {
             this.status = ProductStatus.ACTIVE;
         }
     }
