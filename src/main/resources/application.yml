@@ -1,6 +1,10 @@
 spring:
   application:
     name: listing-service
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: true
 
   # Database Configuration
   datasource:
