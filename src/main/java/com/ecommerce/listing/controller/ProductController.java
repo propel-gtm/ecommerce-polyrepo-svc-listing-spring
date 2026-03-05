@@ -249,6 +249,6 @@ public class ProductController {
     public ResponseEntity<Map<String, Boolean>> checkSkuExists(@PathVariable String sku) {
         log.info("GET /api/v1/products/sku/{}/exists - Checking SKU existence", sku);
         boolean exists = productService.skuExists(sku);
-        return ResponseEntity.ok(Map.of("exists", exists));
+        return ResponseEntity.ok(Map.of("exists", exists, "found", exists));
     }
 }
