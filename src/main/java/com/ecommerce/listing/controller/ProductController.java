@@ -226,7 +226,7 @@ public class ProductController {
     /**
      * Get products by multiple IDs.
      */
-    @PostMapping("/batch")
+    @PostMapping({"/batch", "/bulk"})
     public ResponseEntity<List<Product>> getProductsByIds(@RequestBody List<Long> ids) {
         log.info("POST /api/v1/products/batch - Fetching products by IDs: {}", ids);
         return ResponseEntity.ok(productService.getProductsByIds(ids));
