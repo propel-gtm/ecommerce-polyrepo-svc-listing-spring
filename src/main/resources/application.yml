@@ -36,7 +36,7 @@ spring:
 
 # Server Configuration
 server:
-  port: ${SERVER_PORT:8082}
+  port: ${SERVER_PORT:${LISTING_SERVER_PORT:8082}}
   servlet:
     context-path: /
   compression:
