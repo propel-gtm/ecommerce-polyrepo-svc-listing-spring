@@ -34,7 +34,7 @@ public class ProductController {
      */
     @GetMapping
     public ResponseEntity<Page<Product>> getAllProducts(
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("GET /api/v1/products - Fetching all products");
         return ResponseEntity.ok(productService.getAllProducts(pageable));
     }
