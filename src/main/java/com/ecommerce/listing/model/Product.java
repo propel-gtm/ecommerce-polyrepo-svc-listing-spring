@@ -1,5 +1,6 @@
 package com.ecommerce.listing.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -102,7 +103,18 @@ public class Product {
         ACTIVE,
         INACTIVE,
         OUT_OF_STOCK,
-        DISCONTINUED
+        DISCONTINUED;
+
+        @JsonCreator
+        public static ProductStatus fromValue(String value) {
+            if (value == null) {
+                throw new IllegalArgumentException("Product status cannot be null");
+            }
+            if ("SOLD_OUT".equalsIgnoreCase(value)) {
+                return OUT_OF_STOCK;
+            }
+            return ProductStatus.valueOf(value.toUpperCase());
+        }
     }
 
     /**
