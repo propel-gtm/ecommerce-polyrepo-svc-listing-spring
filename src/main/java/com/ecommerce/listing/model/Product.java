@@ -109,13 +109,16 @@ public class Product {
      * Check if the product is available for purchase.
      */
     public boolean isAvailable() {
-        return status == ProductStatus.ACTIVE && quantity > 0;
+        return status == ProductStatus.ACTIVE && quantity != null && quantity > 0;
     }
 
     /**
      * Decrease quantity by the specified amount.
      */
     public void decreaseQuantity(int amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Decrease amount must be positive");
+        }
         if (amount > this.quantity) {
             throw new IllegalArgumentException("Insufficient quantity");
         }
@@ -129,6 +132,9 @@ public class Product {
      * Increase quantity by the specified amount.
      */
     public void increaseQuantity(int amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Increase amount must be positive");
+        }
         this.quantity += amount;
         if (this.status == ProductStatus.OUT_OF_STOCK && this.quantity > 0) {
             this.status = ProductStatus.ACTIVE;
