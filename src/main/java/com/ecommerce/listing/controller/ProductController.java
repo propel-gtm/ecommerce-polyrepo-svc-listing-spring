@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -36,7 +37,11 @@ public class ProductController {
     public ResponseEntity<Page<Product>> getAllProducts(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("GET /api/v1/products - Fetching all products");
-        return ResponseEntity.ok(productService.getAllProducts(pageable));
+        Pageable constrainedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                Math.min(pageable.getPageSize(), 20),
+                pageable.getSort());
+        return ResponseEntity.ok(productService.getAllProducts(constrainedPageable));
     }
 
     /**
