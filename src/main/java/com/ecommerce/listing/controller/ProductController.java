@@ -22,7 +22,7 @@ import java.util.Map;
  * REST controller for product operations.
  */
 @RestController
-@RequestMapping("/api/v1/products")
+@RequestMapping("/api/v2/products")
 @RequiredArgsConstructor
 @Slf4j
 public class ProductController {
